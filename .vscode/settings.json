@@ -1,0 +1,5 @@
+{
+    "python.pythonPath": "/Users/amangum/anaconda/envs/py38/bin/python",
+    "python.linting.flake8Enabled": true,
+    "python.linting.enabled": true
+}
