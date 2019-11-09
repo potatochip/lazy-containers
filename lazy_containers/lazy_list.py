@@ -6,25 +6,14 @@ from collections.abc import MutableSequence, MutableSet
 from collections import Counter
 
 
-class OptimizeMeta(type):
-    def __call__(self, *args, **kwargs):
-        cls = super().__call__(self, *args, **kwargs)
-        if kwargs.get('optimize_memory', False):
-            setattr(cls, '__set_seq', property(lambda self: set(self.seq)))
-        else:
-            setattr(cls, '__set_seq', set(args[0]))
-        return cls
-
-    # TODO: need to modify setting to use appropriate method
-    # TODO: need to catch seq and optimize_memory from both args and kwargs
-    # TODO: LazyList subclass MutableSet as well
+# TODO: LazyList subclass MutableSet as well
 
 
-class LazyList(MutableSequence):#, MutableSet):  #, metaclass=OptimizeMeta):
+class LazyList(MutableSequence, MutableSet):
     def __init__(self, seq, optimize_memory=False):
         self.__seq = seq
         self.__set = set(seq)
-        self.__count = Counter(seq)  # trade off memory for time in del
+        self.__count = Counter(seq)  # trade off memory for time in del op
 
     @property
     def seq(self):
@@ -80,7 +69,10 @@ class LazyList(MutableSequence):#, MutableSet):  #, metaclass=OptimizeMeta):
         # better performance using internal count
         return self.__count[value]
 
-    def insert(self, index, object):
-        self.seq.insert(index, object)
-        self.__set.add(object)
-        self.__count[object] += 1
+    def insert(self, index, value):
+        self.seq.insert(index, value)
+        self.__set.add(value)
+        self.__count[value] += 1
+
+    add = MutableSequence.append
+    discard = MutableSequence.remove
