@@ -1,22 +1,32 @@
-"""List-like data-type that automatically uses set where more efficient.
-
-Includes all operations of both set and list so you don't have to brain.
-"""
+"""List-like data-types."""
 from collections.abc import MutableSequence, MutableSet
 from collections import Counter
 
 
-# TODO: LazyList subclass MutableSet as well
-
-
 class LazyList(MutableSequence, MutableSet):
-    def __init__(self, seq, optimize_memory=False):
+    """List-like data-type that automatically uses set where more efficient.
+
+    Includes all operations of both set and list so you don't have to brain.
+
+    Attributes:
+        seq: Internal list object
+        set: Interal set object
+    """
+
+    def __init__(self, seq=None):
+        """Init LazyList.
+
+        Args:
+            seq (sequence, optional): An iterable object. Default is None.
+        """
+        seq = list(seq) or []
         self.__seq = seq
         self.__set = set(seq)
         self.__count = Counter(seq)  # trade off memory for time in del op
 
     @property
     def seq(self):
+        """Return internal list object."""
         return self.__seq
 
     @seq.setter
@@ -27,6 +37,7 @@ class LazyList(MutableSequence, MutableSet):
 
     @property
     def set(self):
+        """Return internal set object."""
         return self.__set
 
     def __repr__(self):
@@ -57,7 +68,7 @@ class LazyList(MutableSequence, MutableSet):
         try:
             value = self.seq.pop(index)
             self.__count[value] -= 1
-            if not self.__count:
+            if not self.__count[value]:
                 self.__set.remove(value)
         except IndexError:
             pass
@@ -66,13 +77,15 @@ class LazyList(MutableSequence, MutableSet):
         return self.seq.__len__()
 
     def count(self, value):
+        """Return number of occurrences of value."""
         # better performance using internal count
         return self.__count[value]
 
-    def insert(self, index, value):
-        self.seq.insert(index, value)
-        self.__set.add(value)
-        self.__count[value] += 1
+    def insert(self, index, object):
+        """Insert object before index."""
+        self.seq.insert(index, object)
+        self.__set.add(object)
+        self.__count[object] += 1
 
     add = MutableSequence.append
     discard = MutableSequence.remove

@@ -7,4 +7,4 @@ def test_extend():
     assert l.set == {1,2,3,4,5}
 
 
-# TODO: more tests
+# TODO: need more test coverage
